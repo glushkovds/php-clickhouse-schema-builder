@@ -6,7 +6,7 @@ $ddl = (new MergeTree('some_table'))
     ->dbName('some_db') // optional, for replicated table engine 
     ->onCluster('some_cluster')
     ->columns(fn(MergeTree $t) => [
-        $t->string('col_one')->default('5')->comment('some comment'),,
+        $t->string('col_one')->default('5')->comment('some comment'),
         $t->datetime('at'),
     ])
     ->orderBy('col_one')
