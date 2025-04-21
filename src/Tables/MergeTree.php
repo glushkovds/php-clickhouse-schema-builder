@@ -139,9 +139,9 @@ class MergeTree implements Element
         return $this;
     }
 
-    public function columns(callable $callback): static
+    public function columns(callable|array $columns): static
     {
-        $this->columns = $callback($this);
+        $this->columns = is_array($columns) ? $columns : $columns($this);
         return $this;
     }
 
