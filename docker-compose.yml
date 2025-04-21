@@ -1,0 +1,12 @@
+services:
+
+  php:
+    build: tests/docker
+    command:
+      - /bin/bash
+      - -c
+      - |
+        [[ -d ./vendor ]] || composer install
+        ./vendor/bin/phpunit tests
+    volumes:
+      - ./:/app

@@ -1,0 +1,39 @@
+{
+  "name": "glushkovds/php-clickhouse-schema-builder",
+  "description": "PHP library for generating DDL statements for ClickHouse",
+  "keywords": [
+    "php",
+    "clickhouse",
+    "ddl",
+    "schema",
+    "builder"
+  ],
+  "homepage": "https://github.com/glushkovds/php-clickhouse-schema-builder",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Denis Glushkov",
+      "email": "amkarovec@gmail.com",
+      "homepage": "https://github.com/glushkovds"
+    }
+  ],
+  "require": {
+    "php": ">=8.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9"
+  },
+  "suggest": {
+  },
+  "autoload": {
+    "psr-4": {
+      "PhpClickHouseSchemaBuilder\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  }
+}
