@@ -30,7 +30,7 @@ class MainTest extends TestCase
                 ->columns(fn(MergeTree $t) => [
                     $t->string('col_one')->default('5')->comment('some comment'),
                     $t->string('col_two')->default(new Expression('col_one')),
-                    $t->integer('col_int1'),
+                    $t->integer('col_int1')->default(0),
                     $t->integer('col_int2', 128),
                     $t->integer('col_int3', 256, false),
                     $t->uInt8('col_int4'),

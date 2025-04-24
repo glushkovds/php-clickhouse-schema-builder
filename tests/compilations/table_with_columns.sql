@@ -1,7 +1,7 @@
 CREATE TABLE some_table (
   col_one String DEFAULT '5' COMMENT 'some comment',
   col_two String DEFAULT col_one,
-  col_int1 Int32,
+  col_int1 Int32 DEFAULT 0,
   col_int2 Int128,
   col_int3 UInt256,
   col_int4 UInt8,

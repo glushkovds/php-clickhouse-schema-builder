@@ -115,6 +115,11 @@ class MergeTree implements Element
         return $this;
     }
 
+    public function getEngine(): Engine
+    {
+        return $this->engine;
+    }
+
     public function orderBy(...$orderBy): static
     {
         $this->orderBy = $orderBy;
