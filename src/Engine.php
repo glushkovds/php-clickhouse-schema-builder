@@ -81,4 +81,14 @@ class Engine implements Element
         $this->replicaName = $replicaName;
         return $this;
     }
+
+    /**
+     * @param string $type Engine::REPLACING_MERGE_TREE for example
+     * @return $this
+     */
+    public function setType(string $type): Engine
+    {
+        $this->type = $type;
+        return $this;
+    }
 }
