@@ -27,7 +27,7 @@ class MergeTree implements Element
 
     public function __construct(protected string $name)
     {
-        $this->engine = new Engine();
+        $this->engine = (new Engine())->setTableName($this->name);
     }
 
     public function compile(): string
@@ -141,6 +141,7 @@ class MergeTree implements Element
     public function dbName(?string $dbName): static
     {
         $this->dbName = $dbName;
+        $this->getEngine()->setDbName($dbName);
         return $this;
     }
 
