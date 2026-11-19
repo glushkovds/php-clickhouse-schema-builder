@@ -51,6 +51,11 @@ class Syntax
         return '"' . $elementName . '"';
     }
 
+    public static function escapeString(string $value): string
+    {
+        return "'" . str_replace(['\\', "'"], ['\\\\', "\\'"], $value) . "'";
+    }
+
     public static function escapeParam(mixed $value)
     {
         return match (true) {

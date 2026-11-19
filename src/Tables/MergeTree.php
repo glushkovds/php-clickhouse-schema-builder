@@ -7,6 +7,7 @@ use PhpClickHouseSchemaBuilder\Column;
 use PhpClickHouseSchemaBuilder\Element;
 use PhpClickHouseSchemaBuilder\Engine;
 use PhpClickHouseSchemaBuilder\Exceptions\IncompleteClickHouseDDLException;
+use PhpClickHouseSchemaBuilder\Index;
 use PhpClickHouseSchemaBuilder\Syntax;
 use PhpClickHouseSchemaBuilder\TTL;
 
@@ -16,6 +17,9 @@ class MergeTree implements Element
 
     /** @var Column[] */
     protected array $columns = [];
+    /** @var Index[] */
+    protected array $indexes = [];
+    protected ?string $comment = null;
     protected bool $ifNotExistsClause = false;
     protected ?string $onCluster = null;
     protected Engine $engine;
@@ -51,12 +55,8 @@ class MergeTree implements Element
 
     protected function compileColumns(): string
     {
-        $ddl = ['('];
-        $count = count($this->columns);
-        foreach ($this->columns as $index => $column) {
-            $ddl[] = '  ' . $column->compile() . ($index + 1 === $count ? '' : ',');
-        }
-        $ddl[] = ')';
+        $elements = array_map(fn(Element $e) => '  ' . $e->compile(), [...$this->columns, ...$this->indexes]);
+        $ddl = ['(', implode(",\n", $elements), ')'];
         return implode("\n", $ddl);
     }
 
@@ -76,6 +76,9 @@ class MergeTree implements Element
                 $settings[] = "$settingName = $settingValue";
             }
             $ddl[] = 'SETTINGS ' . implode(', ', $settings);
+        }
+        if ($this->comment) {
+            $ddl[] = 'COMMENT ' . Syntax::escapeString($this->comment);
         }
         return implode("\n", $ddl);
     }
@@ -174,6 +177,33 @@ class MergeTree implements Element
     public function settings(array $settings): static
     {
         $this->settings = $settings;
+        return $this;
+    }
+
+    /**
+     * @param callable|Index[] $indexes
+     */
+    public function indexes(callable|array $indexes): static
+    {
+        $this->indexes = is_array($indexes) ? $indexes : $indexes($this);
+        return $this;
+    }
+
+    /**
+     * Data skipping index.
+     * @param string $expression column name or expression, e.g. length(col)
+     * @param string $type e.g. minmax, set(100), bloom_filter, bloom_filter(0.01)
+     */
+    public function index(string $name, string $expression, string $type, ?int $granularity = null): Index
+    {
+        $index = new Index($name, $expression, $type, $granularity);
+        $this->indexes[] = $index;
+        return $index;
+    }
+
+    public function comment(?string $comment): static
+    {
+        $this->comment = $comment;
         return $this;
     }
 }

@@ -182,6 +182,64 @@ class MainTest extends TestCase
         );
     }
 
+    public function testColumnCodec()
+    {
+        $this->assertMergeTree(
+            (new MergeTree('some_table'))
+                ->columns(fn(MergeTree $t) => [
+                    $t->datetime('at', 3)->comment('some comment')->codec('DoubleDelta, ZSTD(1)'),
+                    $t->string('col_one')->default('')->codec('ZSTD(3)'),
+                ])
+                ->orderBy('at'),
+            'table_with_codecs'
+        );
+    }
+
+    public function testLowCardinality()
+    {
+        $this->assertMergeTree(
+            (new MergeTree('some_table'))
+                ->columns(fn(MergeTree $t) => [
+                    $t->string('col_one')->lowCardinality()->comment('some comment'),
+                    $t->string('col_two')->lowCardinality()->nullable(),
+                    $t->string('col_three')->lowCardinality()->lowCardinality(false),
+                ])
+                ->orderBy('col_one'),
+            'table_with_low_cardinality'
+        );
+    }
+
+    public function testIndexes()
+    {
+        $this->assertMergeTree(
+            (new MergeTree('some_table'))
+                ->columns(fn(MergeTree $t) => [
+                    $t->string('col_one'),
+                    $t->string('col_two'),
+                ])
+                ->indexes(fn(MergeTree $t) => [
+                    $t->index('col_two_idx', 'col_two', 'bloom_filter', 4),
+                    $t->index('col_one_len_idx', 'length(col_one)', 'minmax'),
+                ])
+                ->orderBy('col_one'),
+            'table_with_indexes'
+        );
+    }
+
+    public function testTableComment()
+    {
+        $this->assertMergeTree(
+            (new MergeTree('some_table'))
+                ->columns(fn(MergeTree $t) => [
+                    $t->string('col_one')->comment("Column's comment"),
+                ])
+                ->orderBy('col_one')
+                ->settings(['ttl_only_drop_parts' => 1])
+                ->comment("Table's comment"),
+            'table_with_comment'
+        );
+    }
+
     protected function assertMergeTree(MergeTree $table, string $precompiledFile): void
     {
         $actual = $table->compile();

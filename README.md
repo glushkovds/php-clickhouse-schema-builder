@@ -23,12 +23,17 @@ $ddl = (new MergeTree('some_table'))
     ->onCluster('some_cluster')
     ->columns(fn(MergeTree $t) => [
         $t->string('col_one')->default('5')->comment('some comment'),
-        $t->datetime('at'),
+        $t->string('col_two')->lowCardinality(),
+        $t->datetime('at', 3)->codec('DoubleDelta, ZSTD(1)'),
+    ])
+    ->indexes(fn(MergeTree $t) => [
+        $t->index('col_one_idx', 'col_one', 'bloom_filter', 4), // data skipping index
     ])
     ->orderBy('col_one')
     ->partition('toDate(at)')
     ->ttl('at', '1 month')
     ->engine((new Engine(Engine::REPLACING_MERGE_TREE))->replicated(), 'col_one')
     ->settings(['ttl_only_drop_parts' => 1, 'index_granularity' => 8192])
+    ->comment('some table comment')
     ->compile();
 ```
